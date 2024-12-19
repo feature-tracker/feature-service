@@ -10,7 +10,7 @@ import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
 @Testcontainers
-class TestcontainersConfiguration {
+public class TestcontainersConfiguration {
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"));
