@@ -17,7 +17,9 @@ class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(c -> c.requestMatchers(
+        http.authorizeHttpRequests(c -> c.requestMatchers("/api/features/*/favorites/**")
+                        .authenticated()
+                        .requestMatchers(
                                 "/favicon.ico",
                                 "/actuator/**",
                                 "/error",
