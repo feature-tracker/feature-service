@@ -5,14 +5,15 @@ import com.sivalabs.ft.features.domain.FavoriteFeatureService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/features/{featureId}/favorites")
+@RequestMapping("/api/features/{featureCode}/favorites")
 @Tag(name = "Favorite Features API")
-public class FavoriteFeatureController {
+class FavoriteFeatureController {
 
     private final FavoriteFeatureService favoriteFeatureService;
 
@@ -26,14 +27,14 @@ public class FavoriteFeatureController {
             description = "Add a feature to the user's favorites list",
             responses = {
                 @ApiResponse(responseCode = "201", description = "Feature added to favorites successfully"),
-                @ApiResponse(responseCode = "400", description = "Invalid feature ID")
+                @ApiResponse(responseCode = "400", description = "Invalid feature Code")
             })
-    public ResponseEntity<Void> addFavoriteFeature(@PathVariable long featureId) {
-        if (featureId <= 0) {
+    ResponseEntity<Void> addFavoriteFeature(@PathVariable String featureCode) {
+        if (StringUtils.isBlank(featureCode)) {
             return ResponseEntity.badRequest().build();
         }
         var username = SecurityUtils.getCurrentUsername();
-        favoriteFeatureService.addFavoriteFeature(username, featureId);
+        favoriteFeatureService.addFavoriteFeature(username, featureCode);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -45,12 +46,12 @@ public class FavoriteFeatureController {
                 @ApiResponse(responseCode = "204", description = "Feature removed from favorites successfully"),
                 @ApiResponse(responseCode = "400", description = "Invalid feature ID")
             })
-    public ResponseEntity<Void> removeFavoriteFeature(@PathVariable long featureId) {
-        if (featureId <= 0) {
+    ResponseEntity<Void> removeFavoriteFeature(@PathVariable String featureCode) {
+        if (StringUtils.isBlank(featureCode)) {
             return ResponseEntity.badRequest().build();
         }
         var username = SecurityUtils.getCurrentUsername();
-        favoriteFeatureService.removeFavoriteFeature(username, featureId);
+        favoriteFeatureService.removeFavoriteFeature(username, featureCode);
         return ResponseEntity.noContent().build();
     }
 }

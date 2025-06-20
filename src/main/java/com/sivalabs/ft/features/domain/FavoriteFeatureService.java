@@ -1,6 +1,5 @@
 package com.sivalabs.ft.features.domain;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,20 +14,22 @@ public class FavoriteFeatureService {
         this.featureRepository = featureRepository;
     }
 
-    public void addFavoriteFeature(String userId, long featureId) {
+    @Transactional
+    public void addFavoriteFeature(String userId, String featureCode) {
         // Check if the feature exists
-        featureRepository.findById(featureId).orElseThrow(() -> new EntityNotFoundException("Feature not found"));
+        final Feature feature = featureRepository.findByCode(featureCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Feature not found"));
 
         // check if the favorite already exists
-        if (favoriteFeatureRepository.existsByUserIdAndFeatureId(userId, featureId)) {
-            return;
+        if (favoriteFeatureRepository.existsByUserIdAndFeatureId(userId, feature.getId())) {
+            throw new DuplicateResourceException("Feature is already favorited by the user");
         }
-        FavoriteFeature favoriteFeature = new FavoriteFeature(featureId, userId);
+        FavoriteFeature favoriteFeature = new FavoriteFeature(feature.getId(), userId);
         favoriteFeatureRepository.save(favoriteFeature);
     }
 
     @Transactional
-    public void removeFavoriteFeature(String userId, long featureId) {
-        favoriteFeatureRepository.deleteByUserIdAndFeatureId(userId, featureId);
+    public void removeFavoriteFeature(String userId, String featureCode) {
+        favoriteFeatureRepository.deleteByUserIdAndFeatureCode(userId, featureCode);
     }
 }

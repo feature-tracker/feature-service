@@ -12,18 +12,18 @@ class FavoriteFeatureControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldAddFavoriteFeature() {
-        long featureId = 1L;
+        var featureCode = "IDEA-1";
         var result =
-                mvc.post().uri("/api/features/{featureId}/favorites", featureId).exchange();
+                mvc.post().uri("/api/features/{featureCode}/favorites", featureCode).exchange();
         assertThat(result).hasStatus(HttpStatus.CREATED);
     }
 
     @Test
     @WithMockOAuth2User(username = "user")
-    void shouldReturn400WhenAddingInvalidFeatureId() {
-        long invalidFeatureId = 0L;
+    void shouldReturn400WhenAddingInvalidFeatureCode() {
+        var invalidFeatureCode = " ";
         var result = mvc.post()
-                .uri("/api/features/{featureId}/favorites", invalidFeatureId)
+                .uri("/api/features/{featureCode}/favorites", invalidFeatureCode)
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
     }
@@ -31,24 +31,44 @@ class FavoriteFeatureControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldRemoveFavoriteFeature() {
-        long featureId = 1L;
+        var featureCode = "IDEA-1";
         // First, add to favorites
-        mvc.post().uri("/api/features/{featureId}/favorites", featureId).exchange();
+        mvc.post().uri("/api/features/{featureCode}/favorites", featureCode).exchange();
 
         // Then, remove from favorites
         var result = mvc.delete()
-                .uri("/api/features/{featureId}/favorites", featureId)
+                .uri("/api/features/{featureId}/favorites", featureCode)
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
     }
 
     @Test
     @WithMockOAuth2User(username = "user")
-    void shouldReturn400WhenRemovingInvalidFeatureId() {
-        long invalidFeatureId = 0L;
+    void shouldReturn400WhenRemovingInvalidFeatureCode() {
+        var invalidFeatureCode = " ";
         var result = mvc.delete()
-                .uri("/api/features/{featureId}/favorites", invalidFeatureId)
+                .uri("/api/features/{featureCode}/favorites", invalidFeatureCode)
                 .exchange();
         assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @WithMockOAuth2User(username = "user")
+    void shouldReturn400WhenAddingAlreadyFavoriteFeature() {
+        var featureCode = "IDEA-2"; // this is already added form script
+
+        var result =
+                mvc.post().uri("/api/features/{featureCode}/favorites", featureCode).exchange();
+        assertThat(result).hasStatus(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    @WithMockOAuth2User(username = "user")
+    void shouldReturn404WhenAddingNonExistentFeature() {
+        var nonExistentFeatureCode = "NON_EXISTENT_FEATURE";
+        var result = mvc.post()
+                .uri("/api/features/{featureCode}/favorites", nonExistentFeatureCode)
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
     }
 }

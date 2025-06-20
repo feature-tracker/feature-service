@@ -1,7 +1,7 @@
+delete from favorite_features;
 delete from features;
 delete from releases;
 delete from products;
-delete from favorite_features;
 
 insert into products (id, code, prefix, name, description, image_url, disabled, created_by, created_at) values
 (1, 'intellij', 'IDEA', 'IntelliJ IDEA', 'JetBrains IDE for Java', 'https://resources.jetbrains.com/storage/products/company/brand/logos/IntelliJ_IDEA.png', false, 'admin', '2024-03-01 00:00:00'),
@@ -25,3 +25,6 @@ insert into features (id, product_id, release_id, code, title, description, stat
 (2, 1, 1, 'IDEA-2', 'SDJ Repository Method AutoCompletion', 'Spring Data JPA Repository Method AutoCompletion as you type', 'NEW', 'daniiltsarev', 'siva', '2024-03-14'),
 (3, 2, null, 'GO-3', 'Make Go to Type and Go to Symbol dumb aware', 'Make Go to Type and Go to Symbol dumb aware', 'IN_PROGRESS', 'antonarhipov', 'andreybelyaev', '2024-01-14')
 ;
+
+insert into favorite_features (id, feature_id, user_id) values
+(1, 2, 'user');

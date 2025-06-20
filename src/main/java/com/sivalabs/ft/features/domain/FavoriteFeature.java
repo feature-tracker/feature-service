@@ -19,7 +19,7 @@ public class FavoriteFeature {
     private Long id;
 
     @Column(name = "feature_id", nullable = false)
-    private long featureId;
+    private Long featureId;
 
     @Column(name = "user_id", nullable = false)
     private String userId;
@@ -32,11 +32,11 @@ public class FavoriteFeature {
         this.id = id;
     }
 
-    public long getFeatureId() {
+    public Long getFeatureId() {
         return featureId;
     }
 
-    public void setFeatureId(long featureId) {
+    public void setFeatureId(Long featureId) {
         this.featureId = featureId;
     }
 
@@ -50,7 +50,7 @@ public class FavoriteFeature {
 
     public FavoriteFeature() {}
 
-    public FavoriteFeature(long featureId, String userId) {
+    public FavoriteFeature(Long featureId, String userId) {
         this.featureId = featureId;
         this.userId = userId;
     }
