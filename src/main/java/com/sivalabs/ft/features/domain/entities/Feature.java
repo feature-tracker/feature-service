@@ -37,6 +37,10 @@ public class Feature {
     @Enumerated(EnumType.STRING)
     private FeatureStatus status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "developer_id")
+    private Developer developer;
+
     @Size(max = 255) @Column(name = "assigned_to")
     private String assignedTo;
 
@@ -115,6 +119,14 @@ public class Feature {
 
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public Developer getDeveloper() {
+        return developer;
+    }
+
+    public void setDeveloper(Developer developer) {
+        this.developer = developer;
     }
 
     public String getCreatedBy() {
