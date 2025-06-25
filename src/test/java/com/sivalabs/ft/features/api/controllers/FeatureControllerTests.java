@@ -61,7 +61,7 @@ class FeatureControllerTests extends AbstractIT {
                 "releaseCode": "IDEA-2023.3.8",
                 "title": "New Feature",
                 "description": "New feature description",
-                "assignedTo": "john.doe"
+                "developerId": "100"
             }
             """;
 
@@ -86,7 +86,7 @@ class FeatureControllerTests extends AbstractIT {
                     assertThat(dto.code()).isEqualTo(code);
                     assertThat(dto.title()).isEqualTo("New Feature");
                     assertThat(dto.description()).isEqualTo("New feature description");
-                    assertThat(dto.assignedTo()).isEqualTo("john.doe");
+                    assertThat(dto.assignedTo()).isEqualTo("siva");
                 });
     }
 
@@ -98,7 +98,7 @@ class FeatureControllerTests extends AbstractIT {
             {
                 "title": "Updated Feature",
                 "description": "Updated description",
-                "assignedTo": "jane.doe",
+                "developerId": "100",
                 "status": "IN_PROGRESS"
             }
             """;
@@ -119,7 +119,7 @@ class FeatureControllerTests extends AbstractIT {
                 .satisfies(dto -> {
                     assertThat(dto.title()).isEqualTo("Updated Feature");
                     assertThat(dto.description()).isEqualTo("Updated description");
-                    assertThat(dto.assignedTo()).isEqualTo("jane.doe");
+                    assertThat(dto.assignedTo()).isEqualTo("siva");
                     assertThat(dto.status()).isEqualTo(FeatureStatus.IN_PROGRESS);
                 });
     }

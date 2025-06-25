@@ -144,7 +144,7 @@ class FeatureController {
                 payload.releaseCode(),
                 payload.title(),
                 payload.description(),
-                payload.assignedTo(),
+                payload.developerId(),
                 username);
         String code = featureService.createFeature(cmd);
         log.info("Created feature with code {}", code);
@@ -173,7 +173,7 @@ class FeatureController {
                 payload.description(),
                 payload.status(),
                 payload.releaseCode(),
-                payload.assignedTo(),
+                payload.developerId(),
                 username);
         featureService.updateFeature(cmd);
     }

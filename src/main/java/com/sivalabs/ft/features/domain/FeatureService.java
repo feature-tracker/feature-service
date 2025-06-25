@@ -4,6 +4,7 @@ import com.sivalabs.ft.features.domain.Commands.CreateFeatureCommand;
 import com.sivalabs.ft.features.domain.Commands.DeleteFeatureCommand;
 import com.sivalabs.ft.features.domain.Commands.UpdateFeatureCommand;
 import com.sivalabs.ft.features.domain.dtos.FeatureDto;
+import com.sivalabs.ft.features.domain.entities.Developer;
 import com.sivalabs.ft.features.domain.entities.Feature;
 import com.sivalabs.ft.features.domain.entities.Product;
 import com.sivalabs.ft.features.domain.entities.Release;
@@ -26,6 +27,7 @@ public class FeatureService {
     private final ReleaseRepository releaseRepository;
     private final FeatureRepository featureRepository;
     private final ProductRepository productRepository;
+    private final DeveloperRepository developerRepository;
     private final FavoriteFeatureRepository favoriteFeatureRepository;
     private final EventPublisher eventPublisher;
     private final FeatureMapper featureMapper;
@@ -35,6 +37,7 @@ public class FeatureService {
             ReleaseRepository releaseRepository,
             FeatureRepository featureRepository,
             ProductRepository productRepository,
+            DeveloperRepository developerRepository,
             FavoriteFeatureRepository favoriteFeatureRepository,
             EventPublisher eventPublisher,
             FeatureMapper featureMapper) {
@@ -42,6 +45,7 @@ public class FeatureService {
         this.releaseRepository = releaseRepository;
         this.featureRepository = featureRepository;
         this.productRepository = productRepository;
+        this.developerRepository = developerRepository;
         this.eventPublisher = eventPublisher;
         this.favoriteFeatureRepository = favoriteFeatureRepository;
         this.featureMapper = featureMapper;
@@ -101,7 +105,10 @@ public class FeatureService {
         feature.setTitle(cmd.title());
         feature.setDescription(cmd.description());
         feature.setStatus(FeatureStatus.NEW);
-        feature.setAssignedTo(cmd.assignedTo());
+        if (cmd.developerId() != null) {
+            Developer developer = developerRepository.findById(cmd.developerId()).orElse(null);
+            feature.setDeveloper(developer);
+        }
         feature.setCreatedBy(cmd.createdBy());
         feature.setCreatedAt(Instant.now());
         featureRepository.save(feature);
@@ -120,7 +127,12 @@ public class FeatureService {
         } else {
             feature.setRelease(null);
         }
-        feature.setAssignedTo(cmd.assignedTo());
+        if (cmd.developerId() != null) {
+            Developer developer = developerRepository.findById(cmd.developerId()).orElse(null);
+            feature.setDeveloper(developer);
+        } else {
+            feature.setDeveloper(null);
+        }
         feature.setStatus(cmd.status());
         feature.setUpdatedBy(cmd.updatedBy());
         feature.setUpdatedAt(Instant.now());

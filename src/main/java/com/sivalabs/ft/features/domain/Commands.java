@@ -26,7 +26,7 @@ public class Commands {
             String releaseCode,
             String title,
             String description,
-            String assignedTo,
+            Long developerId,
             String createdBy) {}
 
     public record UpdateFeatureCommand(
@@ -35,7 +35,7 @@ public class Commands {
             String description,
             FeatureStatus status,
             String releaseCode,
-            String assignedTo,
+            Long developerId,
             String updatedBy) {}
 
     public record DeleteFeatureCommand(String code, String deletedBy) {}
