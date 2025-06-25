@@ -33,7 +33,8 @@ class OpenAPIConfig {
         List<Tag> tags = List.of(
                 new Tag().name("Products API").description("API endpoints to manage products"),
                 new Tag().name("Releases API").description("API endpoints to manage releases"),
-                new Tag().name("Features API").description("API endpoints to manage features"));
+                new Tag().name("Features API").description("API endpoints to manage features"),
+                new Tag().name("Developers API").description("API endpoints to manage developers"));
         return new OpenAPI()
                 .info(info)
                 .addSecurityItem(new SecurityRequirement().addList("Authorization"))
