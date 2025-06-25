@@ -9,6 +9,7 @@ import com.sivalabs.ft.features.domain.models.FeatureStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.data.domain.Page;
 
 class FeatureControllerTests extends AbstractIT {
 
@@ -20,9 +21,65 @@ class FeatureControllerTests extends AbstractIT {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.size()")
+                .extractingPath("$.content.size()")
                 .asNumber()
                 .isEqualTo(2);
+    }
+    
+    @Test
+    void shouldGetFeaturesByReleaseCodeWithPagination() {
+        var result = mvc.get()
+                .uri("/api/features?releaseCode={code}&page=0&size=1", "IDEA-2023.3.8")
+                .exchange();
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.content.size()")
+                .asNumber()
+                .isEqualTo(1);
+        
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$.totalElements")
+                .asNumber()
+                .isEqualTo(2);
+                
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$.totalPages")
+                .asNumber()
+                .isEqualTo(2);
+                
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$.number")
+                .asNumber()
+                .isEqualTo(0);
+    }
+    
+    @Test
+    void shouldGetFeaturesByProductCodeWithPagination() {
+        var result = mvc.get()
+                .uri("/api/features?productCode={code}&page=0&size=1", "intellij")
+                .exchange();
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.content.size()")
+                .asNumber()
+                .isEqualTo(1);
+        
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$.totalElements")
+                .asNumber()
+                .isNotEqualTo(0);
+                
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$.number")
+                .asNumber()
+                .isEqualTo(0);
     }
 
     @Test
@@ -31,7 +88,7 @@ class FeatureControllerTests extends AbstractIT {
         assertThat(result)
                 .hasStatusOk()
                 .bodyJson()
-                .extractingPath("$.size()")
+                .extractingPath("$.totalElements")
                 .asNumber()
                 .isEqualTo(2);
     }

@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,14 +64,14 @@ public class FeatureService {
     }
 
     @Transactional(readOnly = true)
-    public List<FeatureDto> findFeaturesByRelease(String username, String releaseCode) {
-        List<Feature> features = featureRepository.findByReleaseCode(releaseCode);
+    public Page<FeatureDto> findFeaturesByReleasePageable(String username, String releaseCode, Pageable pageable) {
+        Page<Feature> features = featureRepository.findByReleaseCode(releaseCode, pageable);
         return updateFavoriteStatus(features, username);
     }
 
     @Transactional(readOnly = true)
-    public List<FeatureDto> findFeaturesByProduct(String username, String productCode) {
-        List<Feature> features = featureRepository.findByProductCode(productCode);
+    public Page<FeatureDto> findFeaturesByProductPageable(String username, String productCode, Pageable pageable) {
+        Page<Feature> features = featureRepository.findByProductCode(productCode, pageable);
         return updateFavoriteStatus(features, username);
     }
 
@@ -86,6 +88,19 @@ public class FeatureService {
                     return dto;
                 })
                 .toList();
+    }
+    
+    private Page<FeatureDto> updateFavoriteStatus(Page<Feature> features, String username) {
+        if (username == null || features.isEmpty()) {
+            return features.map(featureMapper::toDto);
+        }
+        Set<String> featureCodes = features.stream().map(Feature::getCode).collect(Collectors.toSet());
+        Map<String, Boolean> favoriteFeatures = favoriteFeatureService.getFavoriteFeatures(username, featureCodes);
+        return features.map(feature -> {
+            var dto = featureMapper.toDto(feature);
+            dto.makeFavorite(favoriteFeatures.get(feature.getCode()));
+            return dto;
+        });
     }
 
     @Transactional(readOnly = true)
