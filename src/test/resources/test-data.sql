@@ -1,4 +1,5 @@
 delete from favorite_features;
+delete from comments;
 delete from features;
 delete from releases;
 delete from products;
@@ -28,3 +29,8 @@ insert into features (id, product_id, release_id, code, title, description, stat
 
 insert into favorite_features (id, feature_id, user_id) values
 (1, 2, 'user');
+
+insert into comments (id, code, feature_id, user_name, content) values
+(1, 'COM-10', 1, 'user', 'This is a comment on feature IDEA-1'),
+(2, 'COM-20', 1, 'user', 'This is a comment on feature IDEA-2'),
+(3, 'COM-30', 1, 'user', 'This is a comment on feature GO-3');
