@@ -20,7 +20,7 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <springdoc.version>2.8.9</springdoc.version>
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
-        <spotless-maven-plugin.version>2.44.5</spotless-maven-plugin.version>
+        <spotless-maven-plugin.version>2.45.0</spotless-maven-plugin.version>
         <dockerImageName>sivaprasadreddy/ft-feature-service</dockerImageName>
     </properties>
     <dependencies>
