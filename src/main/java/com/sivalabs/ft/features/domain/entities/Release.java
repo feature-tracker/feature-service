@@ -60,6 +60,13 @@ public class Release {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Release parent;
+
+    @OneToMany(mappedBy = "parent")
+    private Set<Release> children = new LinkedHashSet<>();
+
     @OneToMany(mappedBy = "release")
     private Set<Feature> features = new LinkedHashSet<>();
 
@@ -149,5 +156,21 @@ public class Release {
 
     public void setFeatures(Set<Feature> features) {
         this.features = features;
+    }
+
+    public Release getParent() {
+        return parent;
+    }
+
+    public void setParent(Release parent) {
+        this.parent = parent;
+    }
+
+    public Set<Release> getChildren() {
+        return children;
+    }
+
+    public void setChildren(Set<Release> children) {
+        this.children = children;
     }
 }

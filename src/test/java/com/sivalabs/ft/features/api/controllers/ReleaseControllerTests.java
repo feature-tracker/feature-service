@@ -102,4 +102,53 @@ class ReleaseControllerTests extends AbstractIT {
         var getResult = mvc.get().uri("/api/releases/{code}", "RIDER-2024.2.6").exchange();
         assertThat(getResult).hasStatus(HttpStatus.NOT_FOUND);
     }
+
+    @Test
+    @WithMockOAuth2User(username = "user")
+    void createNewReleaseWithParent() {
+        var parentPayload =
+                """
+            {
+                "productCode": "intellij",
+                "code": "IDEA-2025.2",
+                "description": "IntelliJ IDEA 2025.2"
+            }
+            """;
+
+        var result = mvc.post()
+                .uri("/api/releases")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(parentPayload)
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+
+        var payload =
+                """
+            {
+                "productCode": "intellij",
+                "code": "IDEA-2025.2.1",
+                "parentCode": "IDEA-2025.2",
+                "description": "IntelliJ IDEA 2025.2.1 Update"
+            }
+            """;
+
+        var result2 = mvc.post()
+                .uri("/api/releases")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload)
+                .exchange();
+        assertThat(result2).hasStatus(HttpStatus.CREATED);
+
+        var updatedRelease =
+                mvc.get().uri("/api/releases/{code}", "IDEA-2025.2.1").exchange();
+        assertThat(updatedRelease)
+                .hasStatusOk()
+                .bodyJson()
+                .convertTo(ReleaseDto.class)
+                .satisfies(dto -> {
+                    assertThat(dto.description()).isEqualTo("IntelliJ IDEA 2025.2.1 Update");
+                    assertThat(dto.status()).isEqualTo(ReleaseStatus.DRAFT);
+                    assertThat(dto.parentCode()).isEqualTo("IDEA-2025.2");
+                });
+    }
 }

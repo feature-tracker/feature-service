@@ -22,6 +22,7 @@ create table releases
 (
     id          bigint       not null default nextval('release_id_seq'),
     product_id  bigint       not null,
+    parent_id   bigint,
     code        varchar(50)  not null unique,
     description text,
     status      varchar(50)  not null,
