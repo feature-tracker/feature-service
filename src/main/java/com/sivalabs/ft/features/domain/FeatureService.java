@@ -65,41 +65,46 @@ public class FeatureService {
 
     @Transactional(readOnly = true)
     public List<FeatureDto> findFeaturesByReleaseAndParents(String username, String releaseCode, String fromParentReleaseCode) {
-        List<Feature> features = new java.util.ArrayList<>();
+        List<Feature> features;
         
-        // Get the specified release
-        Optional<Release> releaseOptional = releaseRepository.findByCode(releaseCode);
-        if (releaseOptional.isEmpty()) {
-            return List.of();
-        }
-        
-        Release release = releaseOptional.get();
-        Release currentRelease = release;
-        
-        // If fromParentReleaseCode is specified, find that parent release
-        Release fromParentRelease = null;
-        if (fromParentReleaseCode != null) {
+        // If fromParentReleaseCode is empty, use the direct database query method
+        if (fromParentReleaseCode == null || fromParentReleaseCode.isEmpty()) {
+            features = featureRepository.findByReleaseCodeWithParents(releaseCode);
+        } else {
+            features = new java.util.ArrayList<>();
+            
+            // Get the specified release
+            Optional<Release> releaseOptional = releaseRepository.findByCode(releaseCode);
+            if (releaseOptional.isEmpty()) {
+                return List.of();
+            }
+            
+            Release release = releaseOptional.get();
+            Release currentRelease = release;
+            
+            // Find the parent release
+            Release fromParentRelease = null;
             Optional<Release> fromParentReleaseOptional = releaseRepository.findByCode(fromParentReleaseCode);
             if (fromParentReleaseOptional.isPresent()) {
                 fromParentRelease = fromParentReleaseOptional.get();
             }
-        }
-        
-        // Add features from the current release
-        features.addAll(featureRepository.findByReleaseCode(currentRelease.getCode()));
-        
-        // Traverse up the parent chain until we reach the specified parent or the root
-        while (currentRelease.getParent() != null) {
-            currentRelease = currentRelease.getParent();
             
-            // If we've reached the specified parent release, add its features and stop
-            if (fromParentRelease != null && currentRelease.getCode().equals(fromParentRelease.getCode())) {
-                features.addAll(featureRepository.findByReleaseCode(currentRelease.getCode()));
-                break;
-            }
-            
-            // Otherwise, add features from this parent release and continue up the chain
+            // Add features from the current release
             features.addAll(featureRepository.findByReleaseCode(currentRelease.getCode()));
+            
+            // Traverse up the parent chain until we reach the specified parent or the root
+            while (currentRelease.getParent() != null) {
+                currentRelease = currentRelease.getParent();
+                
+                // If we've reached the specified parent release, add its features and stop
+                if (fromParentRelease != null && currentRelease.getCode().equals(fromParentRelease.getCode())) {
+                    features.addAll(featureRepository.findByReleaseCode(currentRelease.getCode()));
+                    break;
+                }
+                
+                // Otherwise, add features from this parent release and continue up the chain
+                features.addAll(featureRepository.findByReleaseCode(currentRelease.getCode()));
+            }
         }
         
         return updateFavoriteStatus(features, username);

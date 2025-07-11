@@ -4,14 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sivalabs.ft.features.AbstractIT;
 import com.sivalabs.ft.features.WithMockOAuth2User;
+import com.sivalabs.ft.features.domain.FeatureService;
 import com.sivalabs.ft.features.domain.dtos.FeatureDto;
 import com.sivalabs.ft.features.domain.models.FeatureStatus;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 class FeatureControllerTests extends AbstractIT {
+
+    @Autowired
+    FeatureService featureService;
 
     @Test
     void shouldGetFeaturesByReleaseCode() {
@@ -152,6 +157,15 @@ class FeatureControllerTests extends AbstractIT {
 
         assertThat(limitedFeaturesResult).hasStatusOk().bodyJson().extractingPath("$.size()").asNumber()
                 .isEqualTo(featuresCount);
+    }
+
+    @Test
+    @WithMockOAuth2User(username = "user")
+    void shouldGetFeaturesFromReleaseAndParentReleasesWithNativeQuery() {
+        final var featuresCount = createParentReleaseWithFeatures();
+        final int childFeaturesCount = createChildReleaseWithFeatures();
+
+        assertThat(featureService.findFeaturesByReleaseAndParents("user", "IDEA-2025.2.1", null)).hasSize(featuresCount+childFeaturesCount);
     }
 
     private int createParentReleaseWithFeatures() {
