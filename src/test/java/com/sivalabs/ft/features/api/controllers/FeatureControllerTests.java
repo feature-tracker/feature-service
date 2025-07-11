@@ -26,6 +26,17 @@ class FeatureControllerTests extends AbstractIT {
     }
 
     @Test
+    void shouldGetFeaturesByProductCode() {
+        var result = mvc.get().uri("/api/features?productCode={code}", "intellij");
+        assertThat(result)
+                .hasStatusOk()
+                .bodyJson()
+                .extractingPath("$.size()")
+                .asNumber()
+                .isEqualTo(2);
+    }
+
+    @Test
     void shouldGetFeatureByCode() {
         String code = "IDEA-1";
         var result = mvc.get().uri("/api/features/{code}", code).exchange();
