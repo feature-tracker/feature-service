@@ -9,6 +9,7 @@ import com.sivalabs.ft.features.domain.models.FeatureStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 class FeatureControllerTests extends AbstractIT {
 
@@ -45,14 +46,14 @@ class FeatureControllerTests extends AbstractIT {
     void shouldCreateNewFeature() {
         var payload =
                 """
-            {
-                "productCode": "intellij",
-                "releaseCode": "IDEA-2023.3.8",
-                "title": "New Feature",
-                "description": "New feature description",
-                "assignedTo": "john.doe"
-            }
-            """;
+                        {
+                            "productCode": "intellij",
+                            "releaseCode": "IDEA-2023.3.8",
+                            "title": "New Feature",
+                            "description": "New feature description",
+                            "assignedTo": "john.doe"
+                        }
+                        """;
 
         var result = mvc.post()
                 .uri("/api/features")
@@ -122,5 +123,92 @@ class FeatureControllerTests extends AbstractIT {
         // Verify deletion
         var getResult = mvc.get().uri("/api/features/{code}", "IDEA-2").exchange();
         assertThat(getResult).hasStatus(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    @WithMockOAuth2User(username = "user")
+    void shouldGetFeaturesFromReleaseAndParentReleases() {
+        // This test assumes that in the test database:
+        // - IDEA-2025.2 is a release with features
+        // - IDEA-2025.2.1 is another release with features
+        // IDEA-2025.2->IDEA-2025.2.1
+        final var featuresCount = createParentReleaseWithFeatures();
+        final int childFeaturesCount = createChildReleaseWithFeatures();
+
+        // Now test the new endpoint that should get features from both releases
+        // Assuming IDEA-2025.2 is the parent of IDEA-2025.2.1
+        var allFeaturesResult = mvc.get()
+                .uri("/api/features/all-features?releaseCode={code}", "IDEA-2025.2.1")
+                .exchange();
+
+        assertThat(allFeaturesResult).hasStatusOk().bodyJson().extractingPath("$.size()").asNumber()
+                .isEqualTo(featuresCount + childFeaturesCount);
+
+        // Test with fromParentRelease parameter
+        var limitedFeaturesResult = mvc.get()
+                .uri("/api/features/all-features?releaseCode={code}&fromParentRelease={parentCode}",
+                        "IDEA-2025.2", "IDEA-2025.2")
+                .exchange();
+
+        assertThat(limitedFeaturesResult).hasStatusOk().bodyJson().extractingPath("$.size()").asNumber()
+                .isEqualTo(featuresCount);
+    }
+
+    private int createParentReleaseWithFeatures() {
+        var releasePayload = """
+                {
+                    "productCode": "intellij",
+                    "code": "IDEA-2025.2",
+                    "description": "IntelliJ IDEA 2025.2"
+                }""";
+
+        return createReleaseWithFeatures(releasePayload, "IDEA-2025.2");
+    }
+
+    private int createChildReleaseWithFeatures() {
+        var releasePayload = """
+                {
+                    "productCode": "intellij",
+                    "code": "IDEA-2025.2.1",
+                    "parentCode": "IDEA-2025.2",
+                    "description": "IntelliJ IDEA 2025.2.1 Update"
+                }""";
+
+        return createReleaseWithFeatures(releasePayload, "IDEA-2025.2.1");
+    }
+
+    private int createReleaseWithFeatures(String releasePayload, String releaseCode) {
+        var result = mvc.post()
+                .uri("/api/releases")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(releasePayload)
+                .exchange();
+        assertThat(result).hasStatus(HttpStatus.CREATED);
+
+        var featurePayload = String.format("""
+                {
+                    "productCode": "intellij",
+                    "releaseCode": "%s",
+                    "title": "%s New Feature1",
+                    "description": "%s New feature description",
+                    "assignedTo": "s.v"
+                }
+                """, releaseCode, releaseCode, releaseCode);
+
+        final MvcTestResult featureCreationResponse = mvc.post()
+                .uri("/api/features")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(featurePayload)
+                .exchange();
+        assertThat(featureCreationResponse).hasStatus(HttpStatus.CREATED);
+
+        var featuresResult = mvc.get()
+                .uri("/api/features?releaseCode={code}", releaseCode)
+                .exchange();
+
+        assertThat(featuresResult)
+                .hasStatusOk().bodyJson().extractingPath("$.size()").asNumber().isEqualTo(1);
+
+        return 1;
     }
 }
