@@ -180,9 +180,6 @@
                 <configuration>
                     <image>
                         <name>${dockerImageName}</name>
-                        <tags>
-                            ${dockerImageName}:${project.version},${dockerImageName}:latest
-                        </tags>
                     </image>
                 </configuration>
             </plugin>
