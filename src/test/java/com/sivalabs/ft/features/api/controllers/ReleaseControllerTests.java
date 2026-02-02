@@ -42,8 +42,7 @@ class ReleaseControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldCreateNewRelease() {
-        var payload =
-                """
+        var payload = """
             {
                 "productCode": "intellij",
                 "code": "IDEA-2025.1",
@@ -62,8 +61,7 @@ class ReleaseControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldUpdateRelease() {
-        var payload =
-                """
+        var payload = """
             {
                 "description": "Updated description",
                 "status": "RELEASED",

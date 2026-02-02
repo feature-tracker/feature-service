@@ -38,7 +38,7 @@ public class Product {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", nullable = false)
     private String imageUrl;
 
     @NotNull @ColumnDefault("false")

@@ -12,8 +12,7 @@ import org.springframework.data.repository.query.Param;
 interface FavoriteFeatureRepository extends JpaRepository<FavoriteFeature, Long> {
 
     @Modifying
-    @Query(
-            """
+    @Query("""
             delete from FavoriteFeature ff where ff.userId = :userId and
             ff.featureId = (select f.id from Feature f where f.code = :featureCode)
             """)
@@ -22,17 +21,13 @@ interface FavoriteFeatureRepository extends JpaRepository<FavoriteFeature, Long>
     boolean existsByUserIdAndFeatureId(String userId, long featureId);
 
     @Modifying
-    @Query(
-            """
+    @Query("""
             delete from FavoriteFeature ff
             where ff.featureId = (select f.id from Feature f where f.code = :featureCode)
             """)
     void deleteByFeatureCode(String featureCode);
 
-    @Query(
-            nativeQuery = true,
-            value =
-                    """
+    @Query(nativeQuery = true, value = """
             SELECT
                 f.id,
                 f.code,

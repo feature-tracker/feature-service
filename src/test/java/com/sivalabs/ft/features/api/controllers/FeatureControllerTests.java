@@ -43,8 +43,7 @@ class FeatureControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldCreateNewFeature() {
-        var payload =
-                """
+        var payload = """
             {
                 "productCode": "intellij",
                 "releaseCode": "IDEA-2023.3.8",
@@ -82,8 +81,7 @@ class FeatureControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldUpdateFeature() {
-        var payload =
-                """
+        var payload = """
             {
                 "title": "Updated Feature",
                 "description": "Updated description",

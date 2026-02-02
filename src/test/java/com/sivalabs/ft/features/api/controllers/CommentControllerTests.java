@@ -13,8 +13,7 @@ class CommentControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldAddComment() {
-        var payload =
-                """
+        var payload = """
                 {
                     "featureCode": "IDEA-1",
                     "content": "This is a test comment"
@@ -33,8 +32,7 @@ class CommentControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldReturn400WhenFeatureNotFound() {
-        var payload =
-                """
+        var payload = """
                 {
                     "featureCode": "INVALID_CODE",
                     "content": "This comment should fail"

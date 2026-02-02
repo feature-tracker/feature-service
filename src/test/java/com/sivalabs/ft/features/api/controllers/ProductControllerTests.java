@@ -52,8 +52,7 @@ class ProductControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldCreateNewProduct() {
-        var payload =
-                """
+        var payload = """
             {
                 "code": "rover",
                 "prefix": "RVR",
@@ -74,8 +73,7 @@ class ProductControllerTests extends AbstractIT {
     @Test
     @WithMockOAuth2User(username = "user")
     void shouldUpdateProduct() {
-        var payload =
-                """
+        var payload = """
             {
                 "prefix": "IDEA",
                 "name": "IntelliJ IDEA Ultimate",
